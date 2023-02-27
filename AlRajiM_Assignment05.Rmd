@@ -1,0 +1,445 @@
+---
+title: "data605_assignment05"
+author: "Mahmud Hasan Al Raji"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question-1: 
+(Bayesian). A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1 (HIV-1) variants was recently developed. The test maintains 96% sensitivity, meaning that, for those with the disease, it will correctly report “positive” for 96% of them. The test is also 98% specific, meaning that, for those without the disease, 98% will be correctly reported as “negative.” MNR HIV-1 is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate. Given the prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is reported as positive by the new test actually has the disease? If the median cost (consider this the best point estimate) is about $100,000 per positive case total and the test itself costs $1000 per administration, what is the total first-year cost for treating 100,000 individuals?
+
+
+# Ans-1:
+*First-part: Finding the probability that an individual who is reported as positive by the new test actually has the disease.
+
+Let's consider the following events:
+
+Individual has the disease: A
+Individual tested positive: B
+
+Given: 
+
+Prevalence rate i.e. P(Individual has the disease) or P(A)= 0.001
+Sensitivity i.e. P(Individual tested positive|Individual has the disease) or P(B|A)=0.96
+Specificity i.e. P(Individual not tested positive|Individual does not have the disease) or P(not B|not A)=0.98
+
+We have to calculate the probability of the individual who actually has the disease when the individual tested positive i.e. P(Individual has the disease|Individual tested positive) or P(A|B).
+
+It is known from Bayes theorem that the probability of an event A given B: 
+                   
+                    P(A|B) = P(B|A)*P(A)/P(B) 
+                    
+Now,               
+
+                 P(B) = P(B|A)* P(A) + P(B|not A)* P(not A)
+
+```{r }
+Probaility_of_B=0.96*0.001+(1-0.98)*0.999 # Here, Probability_of_B = P(B)
+Probaility_of_B
+
+Probability_of_A_given_B = 0.96*0.001/Probaility_of_B #Probability_of_A_given_B= P(A|B)= P(B|A)*P(A)/P(B)
+Probability_of_A_given_B
+```
+Hence, the probability that an individual who is reported as positive by the new test actually has the disease is 0.046
+
+*Second part: Finding the total first-year cost for treating 100,000 individuals
+```{r }
+cost_administering_test= 100000 * 1000 
+true_positive_cases= 0.001 * 100000 
+cost_treating_positive_cases=100 * 100000 
+total_first_year_cost= cost_administering_test+ cost_treating_positive_cases 
+total_first_year_cost
+```
+
+Hence, the total first-year cost for treating 100,000 individuals is $110,000,000
+
+
+# Question-2:
+(Binomial). The probability of your organization receiving a Joint Commission inspection in any given
+month is .05. What is the probability that, after 24 months, you received exactly 2 inspections? What is
+the probability that, after 24 months, you received 2 or more inspections? What is the probability that
+your received fewer than 2 inspections? What is the expected number of inspections you should have
+received? What is the standard deviation?
+
+# Ans-2:
+
+Binomial probability formula:
+
+P(k) = C(n,k) * p^k * (1-p)^(n-k)
+
+where, P(k)=Probability of exactly k success, C(n,k)= Number of combinations, n = number of trials, p = probability of success, and k = number of successes we're interested in.
+
+```{r message=FALSE}
+
+#The probability of your organization receiving a Joint Commission inspection in any given month is .05.What is the probability that, after 24 months, you received exactly 2 inspections?
+
+probability_receive_exactly_2_inspections=factorial(24)/(factorial(2)*factorial(24-2))*0.05^2*(1-0.05)^(24-2) 
+probability_receive_exactly_2_inspections
+
+# Check with R code
+dbinom(2, size=24, prob=0.05) 
+
+```
+Therefore, the probability of receiving exactly 2 inspections after 24 months is 0.22 
+
+
+Probability of receiving 2 or more inspections would be the following:
+P(2 or more) = P(2) + P(3) + P(4)+ ......... + P(24)
+Using R code:
+```{r }
+# What is the probability that, after 24 months, you received 2 or more inspections? 
+probability_receive_2ormore_inspections=pbinom(1, size=24, prob=0.05, lower.tail = FALSE) 
+probability_receive_2ormore_inspections
+```
+Therefore, the probability of receiving 2 or more inspections after 24 months is 0.34
+
+
+Probability of receiving fewer than 2 inspections would be the following:
+P(fewer than 2) = P(0)+P(1)
+```{r }
+# What is the probability that your received fewer than 2 inspections? 
+probability_receive_fewer_than_2_inspections=(factorial(24)/(factorial(0)*factorial(24-0))*0.05^0*(1-0.05)^(24-0)) +(factorial(24)/(factorial(1)*factorial(24-1))*0.05^1*(1-0.05)^(24-1)) 
+probability_receive_fewer_than_2_inspections 
+
+# Check Using R code 
+probability_receive_fewer_than_2_inspections=pbinom(1, size=24, prob=0.05) 
+probability_receive_fewer_than_2_inspections
+```
+Therefore, the probability of receiving fewer than 2 inspections after 24 months is 0.661
+
+```{r }
+# What is the expected number of inspections you should have received? 
+expected_inspections=0.05 * 24
+expected_inspections
+```
+Hence, the expected number of inspections would be 1.2
+
+Standard deviation will be the following:
+standard deviation = sqrt(n * p * (1-p))
+```{r }
+# What is the standard deviation?
+standard_deviation=sqrt(24*0.05*(1-0.05))
+standard_deviation
+```
+Therefore, the standard deviation is 1.07
+
+# Question-3:
+(Poisson). You are modeling the family practice clinic and notice that patients arrive at a rate of 10 per
+hour. What is the probability that exactly 3 arrive in one hour? What is the probability that more than
+10 arrive in one hour? How many would you expect to arrive in 8 hours? What is the standard
+deviation of the appropriate probability distribution? If there are three family practice providers that can
+see 24 templated patients each day, what is the percent utilization and what are your recommendations?
+
+# Ans-3:
+In case of Poisson distribution, the probability of x arrivals in a given time period is given by the formula:
+P( x arrivals in time t) = (lambda^x * e^(-lambda)) / x!, 
+where, lamda= arrival rate 
+e (Euler's number)=2.71828 (approximate)
+
+```{r}
+# What is the probability that exactly 3 arrive in one hour?
+P_3_arrivals_one_hour = (10^3 * (2.71828)^(-10)) / factorial(3) 
+P_3_arrivals_one_hour
+
+#Check using R :
+P_3_arrivals_one_hour=dpois(3, lambda=10)
+P_3_arrivals_one_hour
+```
+Hence, the probability that exactly 3 patients arrive in one hour is 0.0076
+
+The probability that more than 10 arrive in one hour will be:
+P(more than 10 arrivals in one hour) = 1 - P(0 to 10 arrivals in one hour)
+= 1 - [P(0 arrivals) + P(1 arrival) + ... + P(10 arrivals)]
+```{r}
+#What is the probability that more than 10 arrive in one hour?
+
+Prob_more_than_10_arrivals_one_hour=1-{(10^0 * (2.71828)^(-10)) / factorial(0)+(10^1 * (2.71828)^(-10)) / factorial(1)+(10^2 * (2.71828)^(-10)) / factorial(2)+(10^3 * (2.71828)^(-10)) / factorial(3)+(10^4 * (2.71828)^(-10)) / factorial(4)+(10^5 * (2.71828)^(-10)) / factorial(5)+(10^6 * (2.71828)^(-10)) / factorial(6)+(10^7 * (2.71828)^(-10)) / factorial(7)+(10^8 * (2.71828)^(-10)) / factorial(8)+(10^9 * (2.71828)^(-10)) / factorial(9) +(10^10 * (2.71828)^(-10)) / factorial(10)}
+
+Prob_more_than_10_arrivals_one_hour
+
+# Using R
+Prob_more_than_10_arrivals_one_hour=ppois(10, lambda=10, lower=FALSE)
+Prob_more_than_10_arrivals_one_hour
+```
+Therefore, the probability that more than 10 arrive in one hour is 0.42 
+
+```{r}
+#How many would you expect to arrive in 8 hours?
+expected_arrival_8_hours=10 * 8
+
+expected_arrival_8_hours
+
+```
+So, the number of expected arrival in 8 hours is 80
+
+```{r }
+# What is the standard deviation of the appropriate probability distribution
+
+standard_deviation=sqrt(10)
+standard_deviation
+```
+So, the standard deviation of the probability distribution is 3.16
+
+Percent  utilization will be:
+Percent utilization =(lambda * operating hours) / (providers number * templated patients per day) * 100%
+```{r}
+# If there are three family practice providers that can see 24 templated patients each day, what is the percent utilization?
+percent_utilization=(10*8)/(3*24)*100
+percent_utilization
+
+```
+Hence, percent utilization is 111.11%
+
+Recommendation: It is seen from the calculation above that the clinic's operating capacity is exceeding its capacity limit which is not sustainable in the long run. In order to provide sustainable and efficient service to the patients, the clinic can increase its service provider numbers or reduce patient wait time or increase the operating efficiency of the clinic.
+
+# Questin-4:
+(Hypergeometric). Your subordinate with 30 supervisors was recently accused of favoring nurses. 15
+of the subordinate’s workers are nurses and 15 are other than nurses. As evidence of malfeasance, the
+accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible.
+The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the
+probability he/she would have selected five nurses for the trips? How many nurses would we have
+expected your subordinate to send? How many non-nurses would we have expected your subordinate to
+send?
+
+# Ans-4:
+The hypergeometric probability formula: is used to calculate the probability of getting exactly k successes (i.e., objects of a certain type) in a sample of size n, taken without replacement from a population of size N, where K objects of the desired type are present in the population. The formula is:
+
+P(y) = C(x,y) * C(N-x,n-y) / C(N, n)
+
+where:
+P(y)=the probability of getting exactly y success in sample size
+C(x,y),C(N-x,n-y)and C(N, n)= number of different combinations
+y=the number of successes (objects of the desired type) in the sample
+x= total number of objects of the desired type in the population
+n= sample size
+N= population size
+
+```{r }
+
+# The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the probability he/she would have selected five nurses for the trips?
+
+probability_selected_5_nurses=(factorial(15)/(factorial(5)*factorial(15-5)))*(factorial(30-15)/(factorial(6-5)*factorial((30-15)-(6-5))))/(factorial(30)/(factorial(6)*factorial(30-6)))
+
+probability_selected_5_nurses
+
+# Check by R
+probability_selected_5_nurses=dhyper(5, 15, 15, 6, 0.5)
+probability_selected_5_nurses
+ 
+```
+So,the probability the supervisor would have selected five nurses for the trips is 0.076
+
+```{r }
+# How many nurses would we have expected your subordinate to send?
+nurses_number= 6 * 15/30 
+
+nurses_number
+
+# many non-nurses would we have expected your subordinate to send?
+non_nurses_number= 6 * 15/30
+non_nurses_number
+```
+
+Therefore, the number of nurses and non-nurses would we have expected your subordinate to send are 3 and 3.
+
+# Question-5:
+(Geometric). The probability of being seriously injured in a car crash in an unspecified location is about
+.1% per hour. A driver is required to traverse this area for 1200 hours in the course of a year. What is
+the probability that the driver will be seriously injured during the course of the year? In the course of 15
+months? What is the expected number of hours that a driver will drive before being seriously injured?
+Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the
+next 100 hours?
+
+# Ans-5:
+The formula for geometric distribution CDF is given as follows:
+P(X ≤ x) = 1 - (1 - p)^x
+where,
+P(X ≤ x)=The cumulative distribution function of a random variable, X, that is evaluated at a point, x, can be defined as the probability that X will take a value that is lesser than or equal to x.
+p=probability of success in each trial and 0 <= p <= 1.
+
+```{r }
+# Here given:
+p=0.001
+x=1200
+
+#What is the probability that the driver will be seriously injured during the course of the year?
+Probability_injured=1-(1-p)^x
+Probability_injured
+#Check by R
+Probability_injured=pgeom(1200, .001)
+Probability_injured
+```
+Therefore, the probability that the driver will be seriously injured during the course of the year is 0.70
+
+```{r}
+#What is the probability that the driver will be seriously injured during the course of 15 months?
+p=0.001
+x=1500
+Probability_injured_15months=1-(1-p)^x
+Probability_injured_15months
+
+# Check using R
+Probability_injured_15months=pgeom(1500, .001)
+Probability_injured_15months
+```
+Hence, the probability that the driver will be seriously injured during the course of 15 months is 0.78
+
+```{r}
+# What is the expected number of hours that a driver will drive before being seriously injured? 
+p=0.001
+expected_hours=1/p
+expected_hours
+```
+
+Hence, the expected number of hours that a driver will drive before being seriously injured is 1000
+
+```{r}
+# Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours?
+p=0.001
+probability_injured_next_100hours= (1 - (1-p)^100) /(1 - (1-p)^1200)
+probability_injured_next_100hours
+
+```
+Hence, a driver has driven 1200 hours, the probability that the driver will be injured in the next 100 hours is 0.14
+
+# Question-6: 
+You are working in a hospital that is running off of a primary generator which fails about once in 1000
+hours. What is the probability that the generator will fail more than twice in 1000 hours? What is the
+expected value?
+
+# Ans-6:
+The given problem can be solved by using Poisson distribuition.
+```{r}
+#What is the probability that the generator will fail more than twice in 1000 hours?
+lambda=1
+e=2.71828
+x1=0
+x2=1
+x3=2
+probability_generator_fail_more_than_twice=1-(lambda^x1 * e^(-lambda) /factorial(x1))-(lambda^x2 * e^(-lambda) /factorial(x2))-(lambda^x3 * e^(-lambda)/factorial(x3))
+probability_generator_fail_more_than_twice
+# Check by R
+probability_generator_fail_more_than_twice=pbinom(2, size=1000, prob=.001, lower.tail = FALSE) 
+probability_generator_fail_more_than_twice
+```
+Therefore, the probability that the generator will fail more than twice in 1000 hours is 0.08
+
+```{r }
+#What is the expected value?
+n=1000
+p=1/1000
+expected_value=n*p
+expected_value
+```
+Hence, the expected value is 1
+
+# Question-7:
+A surgical patient arrives for surgery precisely at a given time. Based on previous analysis (or a lack of
+knowledge assumption), you know that the waiting time is uniformly distributed from 0 to 30 minutes.
+What is the probability that this patient will wait more than 10 minutes? If the patient has already
+waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being
+seen? What is the expected waiting time?
+
+# Ans-7:
+This problem is a uniform distribution problem
+```{r}
+#What is the probability that this patient will wait more than 10 minutes
+
+probability_patient_wait_more_than_10_minutes= (30-10)/(30-0)
+probability_patient_wait_more_than_10_minutes
+
+# Check by R
+probability_patient_wait_more_than_10_minutes=punif(10, min = 0, max = 30, lower.tail = FALSE)
+probability_patient_wait_more_than_10_minutes
+```
+Therefore, the probability that the patient will wait more than 10 minutes is 0.67
+
+```{r }
+#If the patient has already waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being seen? 
+
+probability_patient_wait_another_5_minutes_after_waited_10_mintues={(30-15)/(30-0)}/{(30-10)/(30-0)}
+
+probability_patient_wait_another_5_minutes_after_waited_10_mintues
+
+# Check by R
+probability_patient_wait_another_5_minutes_after_waited_10_mintues= punif(15, min = 10, max = 30, lower.tail = FALSE)
+probability_patient_wait_another_5_minutes_after_waited_10_mintues
+```
+Therefore, if the patient has already waited 10 minutes,the prob ability that the patient will wait at least another 5 minutes prior to being seen is 0.75 
+
+```{r }
+#What is the expected waiting time?
+expected_waiting_time=(0+30)/2
+expected_waiting_time
+```
+Hence. the expected waiting time is 15 minutes
+
+# Question-8:
+Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value).
+Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution.
+What is the expected failure time? What is the standard deviation? What is the probability that your
+MRI will fail after 8 years? Now assume that you have owned the machine for 8 years. Given that you
+already owned the machine 8 years, what is the probability that it will fail in the next two years? 
+
+# Ans-8:
+ For exponential distribution, 
+ expected failure time= 1/failure rate=1/(1/expected life time) 
+ 
+```{r}
+# What is the expected failure time?
+life_time=10
+expected_failure_time=1/(1/life_time)
+expected_failure_time
+```
+Hence, expected failure time is 10 years.
+
+*What is the standard deviation?
+The standard deviation of an exponential distribution is equal to the mean i.e., the expected lifetime of the distribution. Therefore, the standard deviation is 10 years.
+
+*What is the probability that your MRI will fail after 8 years?
+The probability that the MRI will fail after 8 years will be the area under the exponential distribution curve. That can be calculated by doing integration of the probability density function (PDF) for an exponential distribution from 8 to infinity integral limit. 
+The PDF function, f(x) = λ * e^(-λ * x), where x is the time until failure and  λ is failure rate which is here 1/10 per year.So, the PDF becomes, f(x) = (1/10) * e^(-(1/10) * x)
+
+```{r }
+#Finding the probability that your MRI will fail after 8 years
+integrand = function(x) {(1/10)*(exp(-(1/10)*x))} # define the integrated function
+prob_MRI_fail_after_8_years=integrate(integrand, lower = 8, upper = Inf) #integrate the function from 8 to Inf
+prob_MRI_fail_after_8_years
+
+# Check by R
+prob_MRI_fail_after_8_years=pexp(8, rate=1/10, lower.tail = FALSE)
+prob_MRI_fail_after_8_years
+```
+Hence,the probability that your MRI will fail after 8 years is 0.45
+
+```{r}
+#Now assume that you have owned the machine for 8 years. Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?
+integrand = function(x) {(1/10)*(exp(-(1/10)*x))} #lambda=1/10 # define the integrated function 
+prob_MRI_fail_next_2_years_after_8_years=integrate(integrand, lower = 0, upper =2) #integrate the function from 0 to 2
+prob_MRI_fail_next_2_years_after_8_years
+```
+So, given that you already owned the machine 8 years, the probability that it will fail in the next two years is 0.1813
+
+
+References:
+1.https://www.cuemath.com/geometric-distribution-formula/
+2.https://homepages.math.uic.edu/~jyang06/stat401/handouts/handout8.pdf
+3.https://byjus.com/maths/poisson-distribution/#:~:text=1%20is%20finite-,Poisson%20Distribution%20Formula,%CE%BB%20%CE%BBx)%2Fx!&text=Also%2C%20read%3A,Probability
+4.https://en.wikipedia.org/wiki/Bayes%27_theorem
+5.https://rpubs.com/mlucich/868531
+6.https://www.cuemath.com/geometric-distribution-formula/
+7.https://en.wikipedia.org/wiki/Hypergeometric_distribution
+
+
+
+
+
+
+
+
+
+
